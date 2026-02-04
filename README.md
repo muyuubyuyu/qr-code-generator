@@ -2,6 +2,12 @@
 
 A small, clean single-file HTML tool to generate print-ready QR codes directly in the browser – perfect for price tags, product links, posters, and in-store use.
 
+## Live Demo
+You can use the QR Code Generator directly in your browser:
+
+https://muyuubyuyu.github.io/qr-code-generator/
+
+
 ## Features
 - **Generate QR codes from any URL**
 - **Adjustable error correction level** (L / M / Q / H)  
