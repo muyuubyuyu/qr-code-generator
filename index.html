@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR‑Code Generator (Dinamo) – Online (CDN) + Clear</title>
+  <title>QR Code Generator – Online (CDN) + Clear</title>
   <style>
     :root { --bg:#f7f7f8; --card:#fff; --txt:#111; --muted:#666; --accent:#111; }
     *{ box-sizing:border-box }
@@ -29,12 +29,12 @@
   <div class="wrap">
     <div class="card">
       <div class="hd">
-        <h1>Dinamo QR‑Code Generator <span class="hint">(Online via CDN)</span></h1>
+        <h1>QR Code Generator <span class="hint">(Online via CDN)</span></h1>
       </div>
       <div class="bd">
         <div>
-          <label for="url">Produkt‑URL</label>
-          <input id="url" type="text" value="" placeholder="https://www.dinamo.de/…" />
+          <label for="url">URL</label>
+          <input id="url" type="text" value="" placeholder="https://example.com/..." />
           <div class="btns" style="margin-top:8px">
             <button type="button" class="btn-clear" id="clear">Clear</button>
           </div>
@@ -42,37 +42,37 @@
 
         <div class="row-fields">
           <div>
-            <label for="size">Größe (px)</label>
+            <label for="size">Size (px)</label>
             <input id="size" type="number" min="128" step="64" value="512" />
-            <div class="hint">Empfehlung: 512–1024 px für Preisschilder.</div>
+            <div class="hint">Recommended: 512–1024 px for printing.</div>
           </div>
           <div>
-            <label for="ec">Fehlertoleranz</label>
+            <label for="ec">Error Correction</label>
             <select id="ec">
               <option value="L">L</option>
               <option value="M">M</option>
               <option value="Q">Q</option>
-              <option value="H" selected>H (empfohlen)</option>
+              <option value="H" selected>H (recommended)</option>
             </select>
           </div>
           <div>
-            <label for="margin">Rand (Quiet Zone)</label>
+            <label for="margin">Margin (Quiet Zone)</label>
             <input id="margin" type="number" min="0" max="8" value="0" />
-            <div class="hint">0 = kein Rand.</div>
+            <div class="hint">0 = no border.</div>
           </div>
         </div>
 
         <div class="btns">
           <button id="generate">Generate</button>
-          <a class="btn" id="dl" download="qr_code.png" style="display:none">PNG speichern</a>
+          <a class="btn" id="dl" download="qr_code.png" style="display:none">Download PNG</a>
         </div>
 
-        <div class="preview" id="preview">Noch kein QR‑Code erzeugt.</div>
+        <div class="preview" id="preview">No QR code generated yet.</div>
       </div>
     </div>
   </div>
 
-  <!-- QRCode Bibliothek über CDN -->
+  <!-- QRCode library via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     function sanitizeUrl(value){ try{ return new URL(value.trim()).toString(); }catch{ return value.trim(); } }
@@ -84,26 +84,26 @@
 
     btnGen.addEventListener('click', async () => {
       const text = sanitizeUrl(urlInp.value);
-      if(!text){ alert('Bitte gib eine URL ein.'); return; }
-      preview.textContent = 'Erzeuge QR‑Code…'; aDl.style.display='none';
+      if(!text){ alert('Please enter a URL.'); return; }
+      preview.textContent = 'Generating QR code...'; aDl.style.display='none';
       try{
         const png = await QRCode.toDataURL(text, {
-          errorCorrectionLevel: ecSel.value, // H empfohlen
-          margin: Number(marInp.value),      // 0 = kein Rand
+          errorCorrectionLevel: ecSel.value, // H recommended
+          margin: Number(marInp.value),      // 0 = no border
           width: Number(sizeInp.value),
           color: { dark: '#000000', light: '#ffffff' }
-          // Version NICHT setzen -> automatisch kleinste passende Version
+          // Do NOT set version -> automatically uses smallest fitting version
         });
-        const img = new Image(); img.className='preview-img'; img.src = png; img.alt='QR‑Code Vorschau';
+        const img = new Image(); img.className='preview-img'; img.src = png; img.alt='QR code preview';
         preview.innerHTML=''; preview.appendChild(img);
         const name = fileSlug(text) + '_qr.png';
-        aDl.href = png; aDl.download = name; aDl.style.display='inline-block'; aDl.textContent = name + ' speichern';
-      }catch(e){ console.error(e); preview.textContent='Fehler beim Erzeugen des QR‑Codes.'; alert('Konnte den QR‑Code nicht erzeugen. Bitte prüfe die URL.'); }
+        aDl.href = png; aDl.download = name; aDl.style.display='inline-block'; aDl.textContent = 'Download ' + name;
+      }catch(e){ console.error(e); preview.textContent='Error generating QR code.'; alert('Could not generate the QR code. Please check the URL.'); }
     });
 
     btnClear.addEventListener('click', () => {
       urlInp.value = '';
-      preview.textContent = 'Noch kein QR‑Code erzeugt.';
+      preview.textContent = 'No QR code generated yet.';
       aDl.style.display='none';
       urlInp.focus();
     });
