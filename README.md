@@ -47,7 +47,5 @@ https://muyuubyuyu.github.io/qr-code-generator/
 The QR library is loaded via CDN:
 - `https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js`
 
-If you need a fully offline version, you can bundle the library locally or embed it directly into the file.
-
 ## License
-Do whatever you want with it. If you want to add a proper license, MIT is a good fit.
+Do whatever you want with it.
