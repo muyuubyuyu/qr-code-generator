@@ -1,4 +1,4 @@
-# Muyuubyuyu QR Code Generator (Online)
+# QR Code Generator (Online)
 
 A small, clean single-file HTML tool to generate print-ready QR codes directly in the browser – perfect for price tags, product links, posters, and in-store use.
 
