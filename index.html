@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR‑Code Generator (Dinamo) – Online (CDN) + Clear</title>
+  <style>
+    :root { --bg:#f7f7f8; --card:#fff; --txt:#111; --muted:#666; --accent:#111; }
+    *{ box-sizing:border-box }
+    body{ margin:0; background:var(--bg); color:var(--txt); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial }
+    .wrap{ max-width:900px; margin:24px auto; padding:0 16px }
+    .card{ background:var(--card); border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 6px 24px rgba(0,0,0,.06); overflow:hidden }
+    .hd{ padding:20px 20px 8px; border-bottom:1px solid #eee }
+    h1{ margin:0; font-size:20px }
+    .bd{ padding:20px; display:grid; gap:18px }
+    label{ font-size:14px; color:var(--muted); margin-bottom:6px; display:block }
+    input[type="text"],input[type="number"],select{ width:100%; border:1px solid #ddd; border-radius:10px; padding:10px 12px; font-size:15px }
+    .row-fields{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap }
+    button,.btn{ background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer }
+    .btn-clear{ background:#e5e7eb; color:#111; }
+    .btn-clear:hover{ background:#d1d5db; }
+    .hint{ font-size:12px; color:var(--muted) }
+    .preview{ display:grid; place-items:center; padding:16px; border:1px dashed #e5e7eb; border-radius:12px; min-height:240px }
+    img.preview-img{ max-width:100%; height:auto; border:1px solid #e5e7eb; border-radius:12px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="hd">
+        <h1>Dinamo QR‑Code Generator <span class="hint">(Online via CDN)</span></h1>
+      </div>
+      <div class="bd">
+        <div>
+          <label for="url">Produkt‑URL</label>
+          <input id="url" type="text" value="" placeholder="https://www.dinamo.de/…" />
+          <div class="btns" style="margin-top:8px">
+            <button type="button" class="btn-clear" id="clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="row-fields">
+          <div>
+            <label for="size">Größe (px)</label>
+            <input id="size" type="number" min="128" step="64" value="512" />
+            <div class="hint">Empfehlung: 512–1024 px für Preisschilder.</div>
+          </div>
+          <div>
+            <label for="ec">Fehlertoleranz</label>
+            <select id="ec">
+              <option value="L">L</option>
+              <option value="M">M</option>
+              <option value="Q">Q</option>
+              <option value="H" selected>H (empfohlen)</option>
+            </select>
+          </div>
+          <div>
+            <label for="margin">Rand (Quiet Zone)</label>
+            <input id="margin" type="number" min="0" max="8" value="0" />
+            <div class="hint">0 = kein Rand.</div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button id="generate">Generate</button>
+          <a class="btn" id="dl" download="qr_code.png" style="display:none">PNG speichern</a>
+        </div>
+
+        <div class="preview" id="preview">Noch kein QR‑Code erzeugt.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRCode Bibliothek über CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    function sanitizeUrl(value){ try{ return new URL(value.trim()).toString(); }catch{ return value.trim(); } }
+    function fileSlug(u){ try{ const { pathname } = new URL(u); const last = pathname.replace(/\/$/,'').split('/').filter(Boolean).pop()||'qr-code'; return last.toLowerCase().replace(/[^a-z0-9-_]+/g,'-'); }catch{ return 'qr-code'; } }
+
+    const $ = (id)=>document.getElementById(id);
+    const urlInp=$('url'), sizeInp=$('size'), ecSel=$('ec'), marInp=$('margin');
+    const btnGen=$('generate'), aDl=$('dl'), preview=$('preview'), btnClear=$('clear');
+
+    btnGen.addEventListener('click', async () => {
+      const text = sanitizeUrl(urlInp.value);
+      if(!text){ alert('Bitte gib eine URL ein.'); return; }
+      preview.textContent = 'Erzeuge QR‑Code…'; aDl.style.display='none';
+      try{
+        const png = await QRCode.toDataURL(text, {
+          errorCorrectionLevel: ecSel.value, // H empfohlen
+          margin: Number(marInp.value),      // 0 = kein Rand
+          width: Number(sizeInp.value),
+          color: { dark: '#000000', light: '#ffffff' }
+          // Version NICHT setzen -> automatisch kleinste passende Version
+        });
+        const img = new Image(); img.className='preview-img'; img.src = png; img.alt='QR‑Code Vorschau';
+        preview.innerHTML=''; preview.appendChild(img);
+        const name = fileSlug(text) + '_qr.png';
+        aDl.href = png; aDl.download = name; aDl.style.display='inline-block'; aDl.textContent = name + ' speichern';
+      }catch(e){ console.error(e); preview.textContent='Fehler beim Erzeugen des QR‑Codes.'; alert('Konnte den QR‑Code nicht erzeugen. Bitte prüfe die URL.'); }
+    });
+
+    btnClear.addEventListener('click', () => {
+      urlInp.value = '';
+      preview.textContent = 'Noch kein QR‑Code erzeugt.';
+      aDl.style.display='none';
+      urlInp.focus();
+    });
+  </script>
+</body>
+</html>
